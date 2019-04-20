@@ -8,6 +8,7 @@ from qgis.utils import *
 import sys
 import os
 from qgis.analysis import QgsNativeAlgorithms
+from qgis.PyQt.QtWidgets import QAction, QMainWindow
 
 #   Instantiate the QGIS Application
 GUIEnabled = False
@@ -35,6 +36,56 @@ print("Processing initiated")
 from processing.tools import *
 import processing
 
+
+class MyWnd(QMainWindow):
+    def __init__(self, layer):
+        QMainWindow.__init__(self)
+
+        self.canvas = QgsMapCanvas()
+        self.canvas.setCanvasColor(Qt.white)
+
+        self.canvas.setExtent(layer.extent())
+        self.canvas.setLayers([layer,rlayer])
+
+        self.setCentralWidget(self.canvas)
+
+        self.actionZoomIn = QAction("Zoom in", self)
+        self.actionZoomOut = QAction("Zoom out", self)
+        self.actionPan = QAction("Pan", self)
+
+        self.actionZoomIn.setCheckable(True)
+        self.actionZoomOut.setCheckable(True)
+        self.actionPan.setCheckable(True)
+
+        self.actionZoomIn.triggered.connect(self.zoomIn)
+        self.actionZoomOut.triggered.connect(self.zoomOut)
+        self.actionPan.triggered.connect(self.pan)
+
+        self.toolbar = self.addToolBar("Canvas actions")
+        self.toolbar.addAction(self.actionZoomIn)
+        self.toolbar.addAction(self.actionZoomOut)
+        self.toolbar.addAction(self.actionPan)
+
+        # create the map tools
+        self.toolPan = QgsMapToolPan(self.canvas)
+        self.toolPan.setAction(self.actionPan)
+        self.toolZoomIn = QgsMapToolZoom(self.canvas, False) # false = in
+        self.toolZoomIn.setAction(self.actionZoomIn)
+        self.toolZoomOut = QgsMapToolZoom(self.canvas, True) # true = out
+        self.toolZoomOut.setAction(self.actionZoomOut)
+
+        self.pan()
+
+    def zoomIn(self):
+        self.canvas.setMapTool(self.toolZoomIn)
+
+    def zoomOut(self):
+        self.canvas.setMapTool(self.toolZoomOut)
+
+    def pan(self):
+        self.canvas.setMapTool(self.toolPan)
+
+
 for feature in vlayer.getFeatures():
     if 'Neuro' in feature["Hospital_speciality"]:
         print(feature["Hospital_name"])
@@ -57,13 +108,16 @@ result['OUTPUT'].renderer().symbol().setWidth(1.0)
 result['OUTPUT'].renderer().symbol().setColor(QColor("red"))
 result['OUTPUT'].triggerRepaint()
 
-canvas = QgsMapCanvas()
+w = MyWnd(result['OUTPUT'])
+w.show()
+
+'''canvas = QgsMapCanvas()
 canvas.setCanvasColor(Qt.white)
 canvas.enableAntiAliasing(True)
 canvas.setExtent(result['OUTPUT'].extent())
 canvas.setLayers([vlayer,result['OUTPUT'],rlayer])
 canvas.freeze(True)
-canvas.show()
+canvas.show()'''
 
 exitcode = app.exec_()
 app.exitQgis()
