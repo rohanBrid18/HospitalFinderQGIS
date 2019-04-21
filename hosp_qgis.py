@@ -17,6 +17,10 @@ app = QgsApplication([], GUIEnabled)
 app.setPrefixPath("C:/OSGeo4W64/apps/qgis", True)
 app.initQgis()
 
+#User inputs
+spc = input("Select Hospital Speciality\n1. Cardiology\n2. Gynaecology\n3. Neurology\n4. Orthopedic Surgeon\n5. Physiology\n6. Surgeon\n7. Allergist\n8. Children's Hospital\n")
+typ = input("Select Hospital type\n1. Private\n2. Government\n3. Trust\n4. All\n")
+
 uri = "C:/ODK Briefcase/Exports/Hospital_final.csv"
 vlayer = QgsVectorLayer("C:/ODK Briefcase/Exports/Hospital_final.csv", "Hosp_final", "ogr")
 path = "http://server.arcgisonline.com/arcgis/rest/services/ESRI_Imagery_World_2D/MapServer?f=json&pretty=true"
@@ -32,7 +36,7 @@ sys.path.append('C:/OSGeo4W64/apps/qgis/python/plugins') # Folder where Processi
 from processing.core.Processing import Processing
 Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
-print("Processing initiated")
+print("Processing initiated\n")
 from processing.tools import *
 import processing
 
@@ -87,7 +91,7 @@ class MyWnd(QMainWindow):
 
 
 for feature in vlayer.getFeatures():
-    if 'Neuro' in feature["Hospital_speciality"]:
+    if spc in feature["Hospital_speciality"] and typ in feature["Hospital_Type"]:
         print(feature["Hospital_name"])
         lat = feature["Location-Latitude"]
         long = feature["Location-Longitude"]
@@ -95,17 +99,20 @@ for feature in vlayer.getFeatures():
         dest = long+","+lat+" [EPSG:4326]"
         print(dest)
         result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
-        print(result['TRAVEL_COST'])
-        cost[dest] = result['TRAVEL_COST']
-        min_cost = min(cost.keys(), key=(lambda k: cost[k]))
+        print("Travel Cost:",result['TRAVEL_COST'],"\n")
+        cost[dest,feature["Hospital_name"]] = result['TRAVEL_COST']
+        
+min_cost = min(cost.keys(), key=(lambda k: cost[k]))
 
-print(min_cost)
-result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':min_cost,'OUTPUT':'memory:'})
+#print(min_cost)
+dest = min_cost[0]
+print("Nearest Hospital:",min_cost[1])
+result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
 #print(result['OUTPUT'])
 #QgsProject.instance().addMapLayers([result['OUTPUT']])
 
 result['OUTPUT'].renderer().symbol().setWidth(1.0)
-result['OUTPUT'].renderer().symbol().setColor(QColor("red"))
+result['OUTPUT'].renderer().symbol().setColor(QColor("blue"))
 result['OUTPUT'].triggerRepaint()
 
 w = MyWnd(result['OUTPUT'])
