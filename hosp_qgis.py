@@ -135,6 +135,9 @@ travel_cost = result['TRAVEL_COST']
 travel_cost = round((travel_cost/1000), 2)
 print("Distance: ", travel_cost, " km")
 
+output_layer = r"C:/Users/acer/Desktop/KML"
+QgsVectorFileWriter.writeAsVectorFormat(result['OUTPUT'], output_layer, "utf-8", result['OUTPUT'].crs(), "KML")
+
 temp = dest.split(',')
 temp[0] = float(temp[0])
 temp1 = temp[1].split(' ')
