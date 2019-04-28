@@ -14,10 +14,10 @@ from qgis.PyQt.QtWidgets import QAction, QMainWindow
 GUIEnabled = False
 app = QgsApplication([], GUIEnabled)
 #   Update prefix path
-app.setPrefixPath("C:/OSGeo4W64/apps/qgis", True)
+app.setPrefixPath("C:/OSGeo4W64/apps/qgis", True) # Folder where qgis is located
 app.initQgis()
 
-#User inputs
+# User inputs
 spc = input("Select Hospital Speciality\n1. Cardiology\n2. Gynaecology\n3. Neurology\n4. Orthopedic Surgeon\n5. Physiology\n6. Surgeon\n7. Allergist\n8. Children's Hospital\n")
 typ = input("Select Hospital type\n1. Private\n2. Government\n3. Trust\n4. All\n")
 flag = 0
@@ -25,10 +25,11 @@ flag = 0
 spcl = {'1': 'cardio', '2': 'Gyneco', '3':'Neuro', '4':'Orthopedic', '5':'Physio', '6':'Surgeon', '7':'allergist', '8':'Children_Hospital'}
 typ1 = {'1':'private', '2': 'government', '3':'trust', '4':'all'}
 
-uri = "C:/ODK Briefcase/Exports/Hospital_final.csv"
-vlayer = QgsVectorLayer("C:/ODK Briefcase/Exports/Hospital_final.csv", "Hosp_final", "ogr")
+# Adding layers
+uri = "Hospital_final.csv"
+vlayer = QgsVectorLayer(uri, "Hosp_final", "ogr")
 path = "http://server.arcgisonline.com/arcgis/rest/services/ESRI_Imagery_World_2D/MapServer?f=json&pretty=true"
-rlayer = QgsRasterLayer(path,"raster")
+rlayer = QgsRasterLayer(path, "raster")
 if vlayer.isValid():
     print("Valid")
 else:
@@ -45,6 +46,7 @@ from processing.tools import *
 import processing
 
 
+# Create map canvas
 class MyWnd(QMainWindow):
     def __init__(self, layer, src, dst):
         QMainWindow.__init__(self)
@@ -94,6 +96,7 @@ class MyWnd(QMainWindow):
         self.canvas.setMapTool(self.toolPan)
 
 
+# Finding features and processing algorithm
 for feature in vlayer.getFeatures():
     if typ1[typ] == 'all':
         print(feature["Hospital_name"])
@@ -102,7 +105,7 @@ for feature in vlayer.getFeatures():
         #print(lat, long)
         dest = long+","+lat+" [EPSG:4326]"
         print(dest)
-        result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
+        result = general.run("native:shortestpathpointtopoint", {'INPUT':'hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
         print("Travel Cost:",result['TRAVEL_COST'],"\n")
         cost[dest,feature["Hospital_name"]] = result['TRAVEL_COST']
         flag += 1
@@ -113,7 +116,7 @@ for feature in vlayer.getFeatures():
         #print(lat, long)
         dest = long+","+lat+" [EPSG:4326]"
         print(dest)
-        result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
+        result = general.run("native:shortestpathpointtopoint", {'INPUT':'hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
         print("Travel Cost:",result['TRAVEL_COST'],"\n")
         cost[dest,feature["Hospital_name"]] = result['TRAVEL_COST']
         flag += 1
@@ -128,6 +131,9 @@ min_cost = min(cost.keys(), key=(lambda k: cost[k]))
 dest = min_cost[0]
 print("Nearest Hospital:",min_cost[1])
 result = general.run("native:shortestpathpointtopoint", {'INPUT':'C:/Users/acer/Downloads/hosp_road.shp','STRATEGY':0,'DIRECTION_FIELD':None,'VALUE_FORWARD':'','VALUE_BACKWARD':'','VALUE_BOTH':'','DEFAULT_DIRECTION':2,'SPEED_FIELD':None,'DEFAULT_SPEED':50,'TOLERANCE':0,'START_POINT':'73.02217460971042,19.04214447607201 [EPSG:4326]','END_POINT':dest,'OUTPUT':'memory:'})
+travel_cost = result['TRAVEL_COST']
+travel_cost = round((travel_cost/1000), 2)
+print("Distance: ", travel_cost, " km")
 
 temp = dest.split(',')
 temp[0] = float(temp[0])
@@ -136,7 +142,7 @@ temp1[0] = float(temp1[0])
 
 source =  QgsVectorLayer('Point', 'points' , "memory")
 pr = source.dataProvider() 
-# add the first point
+# add the source point
 pt = QgsFeature()
 point1 = QgsPointXY(73.02217460971042,19.04214447607201)
 pt.setGeometry(QgsGeometry.fromPointXY(point1))
@@ -149,7 +155,7 @@ source.triggerRepaint()
 
 destination =  QgsVectorLayer('Point', 'points' , "memory")
 pr = destination.dataProvider()
-# add the second point
+# add the destination point
 pt = QgsFeature()
 point2 = QgsPointXY(temp[0],temp1[0])
 pt.setGeometry(QgsGeometry.fromPointXY(point2))
@@ -163,6 +169,7 @@ destination.triggerRepaint()
 #print(result['OUTPUT'])
 #QgsProject.instance().addMapLayers([result['OUTPUT']])
 
+# Processing the output
 result['OUTPUT'].renderer().symbol().setWidth(1.0)
 result['OUTPUT'].renderer().symbol().setColor(QColor("blue"))
 result['OUTPUT'].triggerRepaint()

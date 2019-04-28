@@ -1,0 +1,10 @@
+SubmissionDate,meta-instanceID,Name_of_respondent,Hospital_name,Hospital_speciality,Availability_of_ICU,Phone_No,Hospital_Type,Location-Latitude,Location-Longitude,Location-Altitude,Location-Accuracy,KEY
+,uuid:f6af8c4d-ce94-4610-86b6-c9b8c4a3c4eb,Fhu,NeuroGen,Neuro Surgeon Psychiatrist,yes,3729474528,private,19.0214231,73.01517829,0,0,uuid:f6af8c4d-ce94-4610-86b6-c9b8c4a3c4eb
+,uuid:d66b0a58-b770-40a2-87c4-cef495e672d7,Duq,Millennium Hospital,cardio Gyneco Orthopedic Physio Surgeon allergist,yes,9172840183,private,19.05996174,73.01424991,0,0,uuid:d66b0a58-b770-40a2-87c4-cef495e672d7
+,uuid:b2f2db1d-8b41-4fd4-8b96-70aaefecd4fd,Usj,Terna Hospital,cardio Gyneco Orthopedic Physio Surgeon allergist Children_Hospital,yes,8572819391,trust,19.03187261,73.01630583,0,0,uuid:b2f2db1d-8b41-4fd4-8b96-70aaefecd4fd
+,uuid:923afe87-4cae-495f-bfd9-b5124c5dee4d,Ydj,MGM Hospital,cardio Gyneco Neuro Orthopedic Physio Surgeon allergist Children_Hospital,yes,8472729462,trust,19.07273879,72.99364619,0,0,uuid:923afe87-4cae-495f-bfd9-b5124c5dee4d
+,uuid:4937fc9b-d783-420a-8b6b-c24c513af014,Jfk,NMMC Hospital,cardio Gyneco Orthopedic Physio Surgeon allergist Children_Hospital,yes,4738284638,government,19.0827703,72.99609404,0,0,uuid:4937fc9b-d783-420a-8b6b-c24c513af014
+,uuid:60d0e6ff-0e15-4471-9b5a-15141dbba596,Abc,Apollo Hospital,cardio Gyneco Neuro Physio Surgeon allergist Orthopedic,yes,7746678994,trust,19.02075335,73.02885622,0,0,uuid:60d0e6ff-0e15-4471-9b5a-15141dbba596
+,uuid:e4b52f71-8d57-472b-95c8-47e97a4658c7,Dha,Fortis Hiranandani Hospital,cardio Gyneco Neuro Orthopedic Physio Surgeon allergist Children_Hospital,yes,8482718382,private,19.08349367,72.99582247,0,0,uuid:e4b52f71-8d57-472b-95c8-47e97a4658c7
+,uuid:182961d1-4485-423f-9173-080c26c0b285,Irk,Sterling Wockhardt Hospital,cardio Neuro Orthopedic Physio Surgeon allergist,yes,7194048291,private,19.0699709,72.98737418,0,0,uuid:182961d1-4485-423f-9173-080c26c0b285
+,uuid:aea88f00-34c7-4a5b-8d13-b7a0d2297c19,Hsn,NMMC Hospital,Gyneco Physio Surgeon Children_Hospital,yes,9482018462,government,19.01432221,73.00933912,0,0,uuid:aea88f00-34c7-4a5b-8d13-b7a0d2297c19
